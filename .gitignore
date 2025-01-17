@@ -2,6 +2,13 @@
 # build output
 dist/
 
+# src
+src/**/*.gif
+src/**/*.jpg
+src/**/*.png
+src/**/*.svg
+src/**/*.webp
+
 # dependencies
 node_modules/
 
