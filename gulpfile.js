@@ -1,6 +1,6 @@
-
+// 必要なモジュール
 import { src, dest } from 'gulp';
-import imagemin, {mozjpeg, svgo} from 'gulp-imagemin';
+import imagemin, { mozjpeg, svgo } from 'gulp-imagemin';
 import pngquant from 'imagemin-pngquant';
 import { optimize } from 'svgo';
 import through2 from 'through2';
@@ -11,9 +11,7 @@ var green = '\u001b[32m';
 var reset = '\u001b[0m';
 
 export default () => (
-  // まず、出力先を空にする
-  deleteSync(['dist/**']),
-
+  deleteSync(['dist/**']),  // まず、出力先を空にしておく
   src('src/**/*.{jpg,png,svg}', { encoding: false })
     // 画像を圧縮
     .pipe(
@@ -26,8 +24,7 @@ export default () => (
         svgo()
       ])
     )
-
-    // SVGからdata-name属性を取り除いてみる
+    // SVGからdata-name属性を除去
     .pipe(through2.obj((file, _enc, cb) => {
       const result = optimize(file.contents.toString(), {
         plugins: [
@@ -42,7 +39,6 @@ export default () => (
       file.contents = Buffer.from(result.data);
       cb(null, file);
     }))
-
     // 圧縮率を表示
     .pipe(through2.obj((file, _enc, cb) => {
       const originalSize = file.stat.size;
@@ -51,7 +47,6 @@ export default () => (
       console.log(` - ${green} ${file.relative} ${reset} ${originalSize} bytes -> ${compressedSize} bytes ${green} ${compressionRatio}%削減 ${reset}`);
       cb(null, file);
     }))
-
     // 出力
     .pipe(dest('dist'))
 );
