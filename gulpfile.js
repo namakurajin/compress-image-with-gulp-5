@@ -2,6 +2,7 @@
 import { src, dest } from 'gulp';
 import imagemin, {mozjpeg, svgo} from 'gulp-imagemin';
 import pngquant from 'imagemin-pngquant';
+import { optimize } from 'svgo';
 import through2 from 'through2';
 import { deleteSync } from 'del';
 
@@ -25,6 +26,22 @@ export default () => (
         svgo()
       ])
     )
+
+    // SVGからdata-name属性を取り除いてみる
+    .pipe(through2.obj((file, _enc, cb) => {
+      const result = optimize(file.contents.toString(), {
+        plugins: [
+          {
+            name: 'removeAttrs',
+            params: {
+              attrs: ['data-name']
+            }
+          }
+        ]
+      });
+      file.contents = Buffer.from(result.data);
+      cb(null, file);
+    }))
 
     // 圧縮率を表示
     .pipe(through2.obj((file, _enc, cb) => {
